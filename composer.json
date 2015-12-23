@@ -1,0 +1,29 @@
+{
+    "name": "avoo/framework-generator-bundle",
+    "description": "Resource generator based on Sylius",
+    "type": "library",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.6"
+    },
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Jérémy Jégou",
+            "email": "jejeavo@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Avoo\\Bundle\\GeneratorBundle\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1-dev"
+        }
+    }
+}
