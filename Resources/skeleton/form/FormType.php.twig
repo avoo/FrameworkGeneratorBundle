@@ -1,0 +1,48 @@
+<?php
+
+namespace {{ namespace }};
+
+{% block use_statements %}
+use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+{% endblock use_statements %}
+
+{% block class_definition %}
+class {{ form_class }} extends AbstractResourceType
+{% endblock class_definition %}
+{
+{% block class_body %}
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+        {%- for field in fields %}
+
+            ->add('{{ field }}')
+        {%- endfor %};
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => $this->dataClass,
+            'validation_groups' => $this->validationGroups,
+        ));
+    }
+
+    /**
+    * @return string
+    */
+    public function getName()
+    {
+        return '{{ form_type_name }}';
+    }
+{% endblock class_body %}
+}

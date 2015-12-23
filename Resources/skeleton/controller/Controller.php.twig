@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+{% block use_statements %}
+use Sylius\Bundle\ResourceBundle\Controller\ResourceController;
+{% endblock use_statements %}
+
+{% block class_definition %}
+class {{ controller }}Controller extends ResourceController
+{% endblock class_definition %}
+{
+{% block class_body %}
+{% endblock class_body %}
+}

@@ -1,0 +1,34 @@
+<?php
+
+namespace {{ namespace }};
+
+{% block use_statements %}
+{% endblock use_statements %}
+{% block class_definition %}
+/**
+ * Interface {{ class_name }}
+*/
+interface {{ class_name }}
+{% endblock class_definition %}
+{
+{% block class_body %}
+{% for field in fields %}
+    /**
+     * Set {{ field }}
+     *
+     * @param ${{ field }}
+     *
+     * @return $this
+    */
+    public function set{{ field|ucfirst }}(${{ field }});
+
+    /**
+     * Get {{ field }}
+     *
+     * @return ${{ field }}
+    */
+    public function get{{ field|ucfirst }}();
+
+{% endfor %}
+{% endblock class_body %}
+}

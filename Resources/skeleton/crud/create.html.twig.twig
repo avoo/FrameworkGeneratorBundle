@@ -1,0 +1,30 @@
+{% block extends %}
+{{ "{% extends '" ~ bundle ~ "::layout.html.twig' %}" }}
+{% endblock extends %}
+
+{% block body %}
+{{ "{% block title %}{{ '" ~ prefix ~ ".title." ~ model|lower ~ ".create'|trans }}{% endblock %}" }}
+
+{{ "{% block breadcrumb %}" }}
+    <ol class="breadcrumb">
+        <li><a href="{{ "{{ path('" ~ prefix ~ "_" ~ model|lower ~ "_index') }}" }}">{{ "{{ '" ~ prefix ~ ".title." ~ model|lower ~ ".index'|trans }}" }}</a></li>
+        <li>{{ "{{ '" ~ prefix ~ ".title." ~ model|lower ~ ".create'|trans }}" }}</li>
+    </ol>
+{{ "{% endblock %}" }}
+
+{{ "{% block content %}" }}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <form novalidate action="{{ "{{ path('" ~ action ~ "') }}" }}" {{ "{{ form_enctype(form) }}" }} method="POST">
+                    <div class="box-body">
+                        {{ "{% include '" ~ bundle ~ ":" ~ model ~ ":_form.html.twig' %}" }}
+                        {{ "{{ actions.cancel(path('" ~ cancel ~ "')) }}" }}
+                        {{ "{{ actions.submit() }}" }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{{ "{% endblock %}" }}
+{% endblock body %}

@@ -1,0 +1,66 @@
+{% if 'index' in actions %}
+{{ route_name_prefix }}_index:
+    pattern: /
+    defaults:
+        _controller: {{ bundle }}.controller.{{ entity|lower }}:indexAction
+        _sylius:
+            sortable: true
+            template: {{ resource }}:{{ entity }}:index.html.twig
+{% endif %}
+
+{% if 'show' in actions %}
+{{ route_name_prefix }}_show:
+    path:     /show/{{ '{' ~ identifier ~ '}' }}
+    methods: [GET]
+    defaults:
+        _controller: {{ bundle }}.controller.{{ entity|lower }}:showAction
+        _sylius:
+{% if identifier != 'id' %}
+            criteria:
+                {{ identifier }}: ${{ identifier }}
+{% endif %}
+            template: {{ resource }}:{{ entity }}:show.html.twig
+{% endif %}
+
+{% if 'create' in actions %}
+{{ route_name_prefix }}_create:
+    path: /create
+    methods: [GET, POST]
+    defaults:
+        _controller: {{ bundle }}.controller.{{ entity|lower }}:createAction
+        _sylius:
+            template: {{ resource }}:{{ entity }}:create.html.twig
+            redirect:
+                route: {{ route_name_prefix }}_show
+                parameters: { {{ identifier }}: resource.{{ identifier }} }
+{% endif %}
+
+{% if 'update' in actions %}
+{{ route_name_prefix }}_update:
+    path: /edit/{{ '{' ~ identifier ~ '}' }}
+    methods: [GET, PUT, POST]
+    defaults:
+        _controller: {{ bundle }}.controller.{{ entity|lower }}:updateAction
+        _sylius:
+{% if identifier != 'id' %}
+            criteria:
+                {{ identifier }}: ${{ identifier }}
+{% endif %}
+            template: {{ resource }}:{{ entity }}:update.html.twig
+            redirect:
+                route: {{ route_name_prefix }}_show
+                parameters: { {{ identifier }}: resource.{{ identifier }} }
+{% endif %}
+
+{% if 'delete' in actions %}
+{{ route_name_prefix }}_delete:
+    path: /delete/{{ '{' ~ identifier ~ '}' }}
+    defaults:
+        _controller: {{ bundle }}.controller.{{ entity|lower }}:deleteAction
+        _sylius:
+            redirect: {{ route_name_prefix }}_index:
+{% if identifier != 'id' %}
+            criteria:
+                {{ identifier }}: ${{ identifier }}
+{% endif %}
+{% endif %}

@@ -1,0 +1,73 @@
+{% block list %}
+{{ "{% macro list(" ~ vars ~ ") %}" }}
+    {{ "{% import '" ~ bundle ~ ":Macros:actions.html.twig' as actions %}" }}
+
+    {{ "{% if " ~ vars ~ "|length == 0 %}" }}
+        <div class="text-muted text-center">{{ "{{ '" ~ prefix ~ ".empty." ~ model|lower ~ "'|trans }}" }}</div>
+    {{ "{% else %}" }}
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+{% for field in fields %}
+                                    <th>{{ "{{ sylius_resource_sort('" ~ field ~ "', '" ~ prefix ~ ".label." ~ field ~ "'|trans) }}" }}</th>
+{% endfor %}
+                                    <th>{{ "{{ '" ~ prefix ~ ".label.actions'|trans }}" }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {{ "{% for entity in " ~ vars ~ " %}" }}
+                                <tr>
+{% for field in fields %}
+                                    <td>{{ "{{ entity." ~ field ~ " }}" }}</td>
+{% endfor %}
+                                    <td>
+{% for action, path in actions %}
+                                        {{ "{{ actions." ~ action ~ "(path('" ~ path ~ "', { " ~ identifier ~ " : entity." ~ identifier ~ " })) }}" }}
+{% endfor %}
+                                    </td>
+                                </tr>
+                            {{ "{% endfor %}" }}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ "{{ actions.pagination(" ~ vars ~ ") }}" }}
+    {{ "{% endif %}" }}
+{{ "{% endmacro %}" }}
+{% endblock list %}
+
+{% block show %}
+{{ "{% macro show(" ~ model|lower ~ ") %}" }}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+{% for field in fields %}
+                                <th>{{ "{{ '" ~ prefix ~ ".label." ~ field ~ "'|trans }}" }}</th>
+{% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+{% for field in fields %}
+                                <td>{{ "{{ " ~ model|lower ~ "." ~ field ~ " }}" }}</td>
+{% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{{ "{% endmacro %}" }}
+{% endblock show %}

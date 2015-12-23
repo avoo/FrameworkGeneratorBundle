@@ -1,0 +1,26 @@
+{% block extends %}
+{{ "{% extends '" ~ bundle ~ "::layout.html.twig' %}" }}
+{% endblock extends %}
+
+{% block import %}
+{{ "{% from '" ~ bundle ~ ":" ~ model ~ ":macros.html.twig' import list %}" }}
+{% endblock import %}
+
+{% block body %}
+{{ "{% block breadcrumb %}" }}
+    <ol class="breadcrumb">
+        <li>{{ "{{ '" ~ prefix ~ ".title." ~ model|lower ~ ".index'|trans }}" }}</li>
+    </ol>
+{{ "{% endblock %}" }}
+{{ "{% block title %}{{ '" ~ prefix ~ ".title." ~ model|lower ~ ".index'|trans }}{% endblock %}" }}
+
+{{ "{% block content %}" }}
+    {{ "{{ list(" ~ vars ~ ") }}"}}
+
+    <div class="actions-menu">
+{% for action, path in actions %}
+        {{ "{{ actions." ~ action ~ "(path('" ~ path ~ "')) }}" }}
+{% endfor %}
+    </div>
+{{ "{% endblock %}" }}
+{% endblock body %}
