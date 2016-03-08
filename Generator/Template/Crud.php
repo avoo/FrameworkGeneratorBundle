@@ -51,6 +51,8 @@ class Crud extends Template
             if ($result) {
                 $this->addError($result);
             }
+
+            $this->patchRules();
         }
 
         if ($this->configuration['frontend_crud']) {
@@ -88,6 +90,83 @@ class Crud extends Template
         $b = $this->validateBundle($bundle);
         $this->patchRouting($b);
         $this->generateCrud($b);
+    }
+
+    /**
+     * Patch rules
+     *
+     * @return bool
+     */
+    private function patchRules()
+    {
+        $bundleDir = $this->bundle->getPath();
+        $bundlePrefix = $this->getBundlePrefix();
+        $fileName = $bundlePrefix . '.yml';
+        $configurationFile = $bundleDir . '/Resources/config/app/' . $fileName;
+        $resource = strtolower($this->model);
+
+        $ref = <<<EOF
+sylius_rbac:
+    permissions:\n
+EOF;
+
+        if (!$this->refExist($configurationFile, $ref)) {
+            $this->addError(sprintf('Cannot patch configuration file injection "%s"', $fileName));
+
+            return false;
+        }
+
+        $rules = '        ' . $bundlePrefix . '.manage.' . $resource . ': Manage ' . $resource . "\n";
+        foreach ($this->configuration['actions'] as $action) {
+            $rules .= sprintf('        %s.%s.%s: %s %s', $bundlePrefix, $resource, $action, $action, $resource) . "\n";
+        }
+
+        $nodeDeclaration = <<<EOF
+$rules
+EOF;
+
+        $this->dumpFile($configurationFile, $nodeDeclaration . "\n", $ref);
+
+        $ref = <<<EOF
+    permissions_hierarchy:\n
+EOF;
+
+        $rules = array();
+        foreach ($this->configuration['actions'] as $action) {
+            $rules[] = sprintf('%s.%s.%s', $bundlePrefix, $resource, $action);
+        }
+
+        $rules = implode(', ', $rules);
+        $nodeDeclaration = <<<EOF
+        $bundlePrefix.manage.$resource: [$rules]
+EOF;
+
+        $this->dumpFile($configurationFile, $nodeDeclaration . "\n", $ref);
+
+        $ref = <<<EOF
+    roles:\n
+EOF;
+
+        $nodeDeclaration = <<<EOF
+        $resource:
+            name: $this->model
+            description: $this->model management
+            permissions: [$bundlePrefix.manage.$resource]
+            security_roles: [ROLE_ADMINISTRATION_ACCESS]
+EOF;
+
+        $this->dumpFile($configurationFile, $nodeDeclaration . "\n", $ref);
+
+        $ref = <<<EOF
+    roles_hierarchy:
+        administrator: [
+EOF;
+
+        $nodeDeclaration = <<<EOF
+$resource,
+EOF;
+
+        $this->dumpFile($configurationFile, $nodeDeclaration, $ref);
     }
 
     /**

@@ -113,6 +113,10 @@ EOT
 
         $runner($generator->generate($input->getOption('entity'), $output));
 
+        if (!$input->getOption('no-backend')) {
+            $questionHelper->writeSection($output, "Don't forget to run sylius:rbac:initialize command");
+        }
+
         if (!$input->getOption('no-summary')) {
             $questionHelper->writeGeneratorSummary($output, $generator->getErrors());
         }

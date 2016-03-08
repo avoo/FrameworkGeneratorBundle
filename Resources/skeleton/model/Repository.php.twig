@@ -1,0 +1,18 @@
+<?php
+
+namespace {{ namespace }};
+
+{% block use_statements %}
+use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
+{% endblock use_statements %}
+
+{% block class_definition %}
+/**
+ * {{ class_name }}
+*/
+class {{ class_name }} extends EntityRepository
+{% endblock class_definition %}
+{
+{% block class_body %}
+{% endblock class_body %}
+}

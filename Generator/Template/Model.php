@@ -118,6 +118,14 @@ class Model extends Template
             file_put_contents($mappingPath, $mappingCode);
         }
 
+        $this->renderFile('model/Repository.php.twig',
+            $this->bundle->getPath() . '/Doctrine/ORM/' . $this->model . 'Repository.php',
+            array(
+                'namespace' => $this->bundle->getNamespace() . '\\Doctrine\\ORM',
+                'class_name' => $this->model . 'Repository'
+            )
+        );
+
         $this->patchDependencyInjection();
     }
 
@@ -153,6 +161,7 @@ class Model extends Template
         $configurationFile = $bundleDir . '/DependencyInjection/Configuration.php';
         $resourceName = strtolower($this->model);
         $modelName = $this->configuration['namespace'] . '\\' . $this->model;
+        $repositoryName = $this->bundle->getNamespace() . '\\Doctrine\\ORM\\' . $this->model . 'Repository';
 
         $ref = "->arrayNode('$resourceName')";
 
@@ -175,6 +184,9 @@ class Model extends Template
                                 ->end()
                                 ->scalarNode('controller')->end()
                                 ->scalarNode('form')->end()
+                                ->scalarNode('repository')
+                                    ->defaultValue('$repositoryName')
+                                ->end()
                             ->end()
                         ->end()
 EOF;

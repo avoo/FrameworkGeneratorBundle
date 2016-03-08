@@ -16,10 +16,7 @@ class Controller extends Template
      */
     protected $configuration = array(
         'directory' => null,
-        'namespace' => null,
-        'actions' => array('index', 'show', 'create', 'update', 'delete'),
-        'backend_crud' => true,
-        'frontend_crud' => true
+        'namespace' => null
     );
 
     /**
