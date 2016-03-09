@@ -19,9 +19,7 @@ class Crud extends Template
      */
     protected $configuration = array(
         'backend_bundle'  => null,
-        'frontend_bundle' => null,
         'backend_crud'    => true,
-        'frontend_crud'   => true,
         'actions'         => array('index', 'show', 'create', 'update', 'delete'),
     );
 
@@ -54,14 +52,6 @@ class Crud extends Template
 
             $this->patchRules();
         }
-
-        if ($this->configuration['frontend_crud']) {
-            $result = $this->patchFrontend($this->configuration['frontend_bundle']);
-
-            if ($result) {
-                $this->addError($result);
-            }
-        }
     }
 
     /**
@@ -72,20 +62,6 @@ class Crud extends Template
      * @return array
      */
     private function patchBackend($bundle)
-    {
-        $b = $this->validateBundle($bundle);
-        $this->patchRouting($b);
-        $this->generateCrud($b);
-    }
-
-    /**
-     * Add routing for frontend
-     *
-     * @param string $bundle
-     *
-     * @return array
-     */
-    private function patchFrontend($bundle)
     {
         $b = $this->validateBundle($bundle);
         $this->patchRouting($b);

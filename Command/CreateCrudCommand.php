@@ -22,11 +22,9 @@ class CreateCrudCommand extends GeneratorCommand
             ->setDefinition(array(
                 new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The name of the entity to create CRUD'),
                 new InputOption('backend', '', InputOption::VALUE_OPTIONAL, 'The name of backend bundle'),
-                new InputOption('frontend', '', InputOption::VALUE_OPTIONAL, 'The name of backend bundle'),
             ))
             ->setDescription('Generates a crud from existing entity')
             ->addOption('actions','', InputOption::VALUE_REQUIRED, 'The actions in the controller')
-            ->addOption('no-frontend', null, InputOption::VALUE_NONE, 'Disable basic CRUD generate routing for frontend bundle')
             ->addOption('no-backend', null, InputOption::VALUE_NONE, 'Disable basic CRUD generate routing for backend bundle')
             ->addOption('no-summary', null, InputOption::VALUE_OPTIONAL, 'Disable summary report')
             ->setHelp(<<<EOT
@@ -80,7 +78,7 @@ EOT
             try {
                 $this->getContainer()->get('kernel')->getBundle($bundle);
             } catch (\Exception $e) {
-                $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $bundle));
+                $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</bg>', $bundle));
             }
         }
 
@@ -89,10 +87,6 @@ EOT
 
         if ($input->getOption('no-backend')) {
             $generator->setConfiguration('backend_crud', false);
-        }
-
-        if ($input->getOption('no-frontend')) {
-            $generator->setConfiguration('frontend_crud', false);
         }
 
         if ($input->getOption('actions')) {
@@ -105,10 +99,6 @@ EOT
 
         if (!$input->getOption('no-backend')) {
              $generator->setConfiguration('backend_bundle', $input->getOption('backend'));
-        }
-
-        if (!$input->getOption('no-frontend')) {
-            $generator->setConfiguration('frontend_bundle', $input->getOption('frontend'));
         }
 
         $runner($generator->generate($input->getOption('entity'), $output));
@@ -166,13 +156,13 @@ EOT
                 $b = $this->getContainer()->get('kernel')->getBundle($bundle);
 
                 if (!file_exists($b->getPath().'/Controller/'.$controller.'Controller.php')) {
-                    $output->writeln(sprintf('<bg=red>Controller "%s:%s" does not exist</>.', $bundle, $controller));
+                    $output->writeln(sprintf('<bg=red>Controller "%s:%s" does not exist</bg>.', $bundle, $controller));
                     $input->setOption('no-summary', null);
 
                     continue;
                 }
             } catch (\Exception $e) {
-                $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $bundle));
+                $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</bg>', $bundle));
             }
 
             if (!$input->getOption('no-summary')) {
@@ -183,14 +173,6 @@ EOT
 
                     if (!$backend) {
                         $input->setOption('no-backend', true);
-                    }
-                }
-
-                if (!$input->getOption('frontend')) {
-                    $frontend = $dialog->askConfirmation($output, '<question>With frontend? (y/N)</question>');
-
-                    if (!$frontend) {
-                        $input->setOption('no-frontend', true);
                     }
                 }
             }
@@ -208,7 +190,7 @@ EOT
                 try {
                     $this->getContainer()->get('kernel')->getBundle($backendBundle);
                 } catch (\Exception $e) {
-                    $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $backendBundle));
+                    $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</bg>', $backendBundle));
                     $input->setOption('no-summary', null);
 
                     continue;
@@ -216,37 +198,6 @@ EOT
 
                 $message[] = 'backend CRUD in <info>' . $backendBundle . '</info>';
                 $input->setOption('backend', $backendBundle);
-            }
-
-            if (!$input->getOption('no-frontend')) {
-                $question = new Question($questionHelper->getQuestion('Frontend bundle', $input->getOption('frontend')), $input->getOption('frontend'));
-                $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateBundleName'));
-                $question->setValidator(function ($answer) use ($input) {
-                    if (!$input->getOption('no-backend') && $input->getOption('backend') == $answer) {
-                        throw new \RuntimeException('The frontend and backend bundle must be different.');
-                    }
-
-                    return $answer;
-                });
-
-                $question->setAutocompleterValues($bundleList);
-
-                $frontendBundle = $input->getOption('frontend');
-                if (!$input->getOption('no-summary')) {
-                    $frontendBundle = $questionHelper->ask($input, $output, $question);
-                }
-
-                try {
-                    $this->getContainer()->get('kernel')->getBundle($frontendBundle);
-                } catch (\Exception $e) {
-                    $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $frontendBundle));
-                    $input->setOption('no-summary', null);
-
-                    continue;
-                }
-
-                $message[] = 'frontend CRUD in <info>' . $frontendBundle . '</info>';
-                $input->setOption('frontend', $frontendBundle);
             }
 
             break;

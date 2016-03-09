@@ -152,7 +152,6 @@ class CreateResourceCommand extends ContainerAwareCommand
 
                 if ($dialog->askConfirmation($output, '<question>Would you add CRUD? (y/N)</question>')) {
                     $backend = $dialog->askConfirmation($output, '<question>With backend? (y/N)</question>');
-                    $frontend = $dialog->askConfirmation($output, '<question>With frontend? (y/N)</question>');
                     $crud = array();
 
                     if (!$backend) {
@@ -177,30 +176,6 @@ class CreateResourceCommand extends ContainerAwareCommand
                         }
 
                         $crud['--backend'] = $backendBundle;
-                    }
-
-                    if (!$frontend) {
-                        $crud['--no-frontend'] = true;
-                    } else {
-                        while (true) {
-                            $question = new Question($questionHelper->getQuestion('Frontend bundle', null));
-                            $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateBundleName'));
-                            $question->setAutocompleterValues($bundleList);
-                            $frontendBundle = $questionHelper->ask($input, $output, $question);
-
-                            try {
-                                $this->getContainer()->get('kernel')->getBundle($frontendBundle);
-
-                                break;
-                            } catch (\Exception $e) {
-                                $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $frontendBundle));
-                                $input->setOption('no-summary', null);
-
-                                continue;
-                            }
-                        }
-
-                        $crud['--frontend'] = $frontendBundle;
                     }
 
                     $this->commands[] = array_merge(array(
