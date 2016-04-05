@@ -177,6 +177,8 @@ EOF;
     protected function generateCrud(AbstractResourceBundle $bundle)
     {
         $summary = array();
+        $this->generateMacrosView($bundle);
+
         if (in_array('index', $this->configuration['actions'])) {
             $this->generateIndexView($bundle, $summary);
         }
@@ -206,7 +208,6 @@ EOF;
      */
     protected function generateIndexView(AbstractResourceBundle $bundle, &$summary)
     {
-        $this->generateMacrosView($bundle);
         $path = $bundle->getPath() . '/Resources/views/' . $this->model . '/index.html.twig';
 
         if (file_exists($path)) {
@@ -240,7 +241,6 @@ EOF;
      */
     protected function generateShowView(AbstractResourceBundle $bundle, &$summary)
     {
-        $this->generateMacrosView($bundle);
         $path = $bundle->getPath() . '/Resources/views/' . $this->model . '/show.html.twig';
         $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($this->bundle->getName()) . '\\' . $this->model;
         $identifier = $this->getContainer()->get('doctrine')
@@ -360,6 +360,15 @@ EOF;
                 ->getClassMetadata($entityClass)
                 ->getIdentifier();
 
+            $actions = array();
+            array_map(function($key) use ($bundle, &$actions) {
+                if (in_array($key, array('show', 'update'))) {
+                    $actions[$key] = strtolower($this->getBundlePrefix($bundle) . '_' . $this->model . '_' . $key);
+                }
+            }, $this->configuration['actions']);
+
+            $actions['delete'] = strtolower($this->getBundlePrefix($bundle) . '_' . $this->model . '_delete');
+
             $this->renderFile('crud/macros.html.twig.twig',
                 $bundle->getPath() . '/Resources/views/' . $this->model . '/macros.html.twig',
                 array(
@@ -369,11 +378,7 @@ EOF;
                     'vars'    => strtolower(Inflector::pluralize($this->model)),
                     'identifier' => $identifier[0],
                     'fields'  => $this->getFieldsFromMetadata($metadata[0]),
-                    'actions' => array(
-                        'show' => strtolower($this->getBundlePrefix($bundle) . '_' . $this->model . '_show'),
-                        'edit' => strtolower($this->getBundlePrefix($bundle) . '_' . $this->model . '_update'),
-                        'delete' => strtolower($this->getBundlePrefix($bundle) . '_' . $this->model . '_delete'),
-                    )
+                    'actions' => $actions
                 )
             );
         }
